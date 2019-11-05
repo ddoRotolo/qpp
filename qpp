@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+FOLDER=~/.postits
+ACTION=$1
+POST=$2 
+
+if [ -z "$ACTION" ]
+then
+    ACTION="ls"
+fi
+
+if [ -z "$POST" ]
+then
+    POST="last"
+fi
+
+usage () {
+    cat << __USAGE__
+Name:
+    qpp - Quick Postit Program
+
+Synopsis:
+    qpp [new|get|rm|dir] [target]
+    qpp [ls|sel]
+
+Description:
+    qpp 
+__USAGE__
+}
+
+case $ACTION in
+    "new")
+        cat - > "$FOLDER/$POST"
+        ;;
+    "get")
+        cat "$FOLDER/$POST"
+        ;;
+    "sel")
+        pushd $FOLDER > /dev/null
+        cat $(find . -type f | slmenu)
+        popd > /dev/null
+        ;;
+    "rm")
+        rm -rf "$FOLDER/$POST"
+        ;;
+    "ls")
+        ls --color "$FOLDER"
+        ;;
+    "dir")
+        mkdir $FOLDER/$POST
+        ;;
+    *)
+        usage 
+esac
