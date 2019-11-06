@@ -12,7 +12,7 @@ Name
     qpp - Quick Postit Program
 
 Synopsis
-    qpp [new|add|get|rm|dir] [target]
+    qpp [new|add|get|edit|rm|dir] [target]
     qpp [ls|sel]
 
 Description
@@ -32,6 +32,8 @@ Options
         Adds more text to the target post, or creates it if it doesn't exist.
 
     get: Fetches the text from the target post
+
+    edit: Uses '$EDITOR' to edit the target post
 
     rm: Deletes the target post
 
@@ -75,6 +77,9 @@ case $ACTION in
         ;;
     "get")
         cat "$FOLDER/$POST"
+        ;;
+    "edit")
+        $EDITOR "$FOLDER/$POST"
         ;;
     "rm")
         rm -rf "$FOLDER/$POST"
