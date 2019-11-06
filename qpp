@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 FOLDER=~/.postits
+MENU=slmenu
 ACTION=$1
 POST=$2 
 
 if [ -z "$ACTION" ]
 then
-    ACTION="ls"
+    ACTION="add"
 fi
 
 if [ -z "$POST" ]
@@ -14,40 +15,86 @@ then
     POST="last"
 fi
 
+if [ ! -d "$FOLDER" ]
+then
+    mkdir "$FOLDER"
+fi
+
 usage () {
     cat << __USAGE__
-Name:
+Name
     qpp - Quick Postit Program
 
-Synopsis:
-    qpp [new|get|rm|dir] [target]
+Synopsis
+    qpp [new|add|get|rm|dir] [target]
     qpp [ls|sel]
 
-Description:
-    qpp 
+Description
+    qpp is a program for very quickly making a note from the terminal.
+    It is literally a wrapper around 'cat - > file' with some extra
+    commands to make things easier
+
+    If no target is specified, the file defaults to 'last'
+    If no option is specified, the action defaults to add.
+
+Options
+    new: 
+        Creates a new postit. Everything written into stdin is placed into
+        the target file, overwriting the old post
+
+    add:
+        Adds more text to the target post, or creates it if it doesn't exist.
+
+    get: Fetches the text from the target post
+
+    rm: Deletes the target post
+
+    dir: 
+        Creates a directory with the target name. 
+        Fails if you try to overwrite the default post file.
+
+    ls: Lists all creates posts and folders
+
+    sel: 
+        Uses a menu program to dynamically fetch a post
+        slmenu is used by default, but dmenu or any other menu 
+        like it could be used.
 __USAGE__
 }
 
 case $ACTION in
     "new")
-        cat - > "$FOLDER/$POST"
+        cat - >  "$FOLDER/$POST"
+        ;;
+    "add")
+        cat - >> "$FOLDER/$POST"
         ;;
     "get")
         cat "$FOLDER/$POST"
         ;;
-    "sel")
-        pushd $FOLDER > /dev/null
-        cat $(find . -type f | slmenu)
-        popd > /dev/null
-        ;;
     "rm")
         rm -rf "$FOLDER/$POST"
         ;;
-    "ls")
-        ls --color "$FOLDER"
-        ;;
     "dir")
-        mkdir $FOLDER/$POST
+        if [ "$POST" ==  "last" ]
+        then
+            echo "You can't make a directory with that name"
+        else
+            mkdir "$FOLDER/$POST"
+        fi
+        ;;
+    "ls")
+        ls -R --color "$FOLDER"
+        ;;
+    "sel")
+        if command -v slmenu
+        then
+            pushd $FOLDER > /dev/null
+            cat $(find . -type f | $MENU)
+            popd > /dev/null
+        else
+            echo "$MENU is needed in order to run the sel command"
+        fi
         ;;
     *)
         usage 
