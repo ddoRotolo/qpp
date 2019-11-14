@@ -79,7 +79,12 @@ case $ACTION in
         cat "$FOLDER/$POST"
         ;;
     "edit")
-        $EDITOR "$FOLDER/$POST"
+        if [ -z $EDITOR ]
+        then
+            vim "$FOLDER/$POST"
+        else
+            $EDITOR "$FOLDER/$POST"
+        fi
         ;;
     "rm")
         rm -rf "$FOLDER/$POST"
