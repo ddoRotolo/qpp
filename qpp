@@ -33,7 +33,9 @@ Options
 
     get: Fetches the text from the target post
 
-    edit: Uses '$EDITOR' to edit the target post
+    edit: 
+        Uses '$EDITOR' to edit the target post.
+        If there's no $EDITOR set, it tries vim, then nano, then vi.
 
     rm: Deletes the target post
 
@@ -79,11 +81,17 @@ case $ACTION in
         cat "$FOLDER/$POST"
         ;;
     "edit")
-        if [ -z $EDITOR ]
+        if ! [ -z $EDITOR ]
+        then
+            $EDITOR "$FOLDER/$POST"
+        elif [ -x $(command -v vim) ] 
         then
             vim "$FOLDER/$POST"
-        else
-            $EDITOR "$FOLDER/$POST"
+        elif [ -x $(command -v nano) ] 
+        then
+            nano "$FOLDER/$POST"
+        else 
+            vi "$FOLDER/$POST"
         fi
         ;;
     "rm")
